@@ -1,12 +1,12 @@
 name: Check and Build
 
 env:
-  kernel_repository: PixelExperience-Devices/kernel_xiaomi_sdm845
-  kernel_branch: fourteen
-  device: dipper
-  clang_version: r487747c
+  kernel_repository: myxuebi/kernel_xiaomi_sm8250
+  kernel_branch: nonksu
+  device: munch
+  clang_version: r536225
   defconfig: |
-    dipper_defconfig
+    defconfig
   kernel_patch: |
     backport-path-umount.patch
   kernelsu_patch: |
@@ -94,14 +94,6 @@ jobs:
               cat arch/arm64/configs/$line >>arch/arm64/configs/merged_defconfig
           done <<<"$defconfig"
 
-      - name: Setup KernelSU
-        run: |
-          # https://kernelsu.org/zh_CN/guide/how-to-integrate-for-non-gki.html
-          curl -L https://raw.githubusercontent.com/tiann/KernelSU/main/kernel/setup.sh | bash -s -- $kernelsu_remote_version
-          echo 'CONFIG_KPROBES=y' >>arch/arm64/configs/merged_defconfig
-          echo 'CONFIG_HAVE_KPROBES=y' >>arch/arm64/configs/merged_defconfig
-          echo 'CONFIG_KPROBE_EVENTS=y' >>arch/arm64/configs/merged_defconfig
-
       - name: Apply kernel patch
         run: |
           while read -r line; do
@@ -111,16 +103,6 @@ jobs:
               echo "Applying kernel patch: $line"
               git apply "this-repo/patches/$line"
           done <<<"$kernel_patch"
-
-      - name: Apply KernelSU patch
-        run: |
-          while read -r line; do
-              if [ -z "$line" ] || [[ "$line" == "#"* ]]; then
-                  continue
-              fi
-              echo "Applying KernelSU patch: $line"
-              git apply -p2 --directory KernelSU/kernel "this-repo/patches/$line"
-          done <<<"$kernelsu_patch"
 
       - name: "AOSP-Clang: Restore"
         id: aosp_clang_restore
