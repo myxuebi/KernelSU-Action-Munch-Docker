@@ -4,7 +4,7 @@ env:
   kernel_repository: myxuebi/kernel_xiaomi_sm8250
   kernel_branch: nonksu
   device: munch
-  clang_version: r536225
+  clang_version: r416183b
   defconfig: |
     defconfig
   kernel_patch: |
